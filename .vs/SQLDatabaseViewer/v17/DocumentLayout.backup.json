@@ -1,0 +1,87 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\script\\LIA\\SQLDatabaseViewer\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{C70E4169-BDDC-4AFC-82D5-72F214FA5B36}|SQLDatabaseViewer.csproj|e:\\script\\lia\\sqldatabaseviewer\\form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C70E4169-BDDC-4AFC-82D5-72F214FA5B36}|SQLDatabaseViewer.csproj|solutionrelative:form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C70E4169-BDDC-4AFC-82D5-72F214FA5B36}|SQLDatabaseViewer.csproj|e:\\script\\lia\\sqldatabaseviewer\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C70E4169-BDDC-4AFC-82D5-72F214FA5B36}|SQLDatabaseViewer.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C70E4169-BDDC-4AFC-82D5-72F214FA5B36}|SQLDatabaseViewer.csproj|e:\\script\\lia\\sqldatabaseviewer\\databaseoperations.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C70E4169-BDDC-4AFC-82D5-72F214FA5B36}|SQLDatabaseViewer.csproj|solutionrelative:databaseoperations.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C70E4169-BDDC-4AFC-82D5-72F214FA5B36}|SQLDatabaseViewer.csproj|e:\\script\\lia\\sqldatabaseviewer\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{C70E4169-BDDC-4AFC-82D5-72F214FA5B36}|SQLDatabaseViewer.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "DatabaseOperations.cs",
+              "DocumentMoniker": "E:\\script\\LIA\\SQLDatabaseViewer\\DatabaseOperations.cs",
+              "RelativeDocumentMoniker": "DatabaseOperations.cs",
+              "ToolTip": "E:\\script\\LIA\\SQLDatabaseViewer\\DatabaseOperations.cs",
+              "RelativeToolTip": "DatabaseOperations.cs",
+              "ViewState": "AgIAADMAAAAAAAAAAAAqwE0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-24T10:29:01.416Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Form1.cs",
+              "DocumentMoniker": "E:\\script\\LIA\\SQLDatabaseViewer\\Form1.cs",
+              "RelativeDocumentMoniker": "Form1.cs",
+              "ToolTip": "E:\\script\\LIA\\SQLDatabaseViewer\\Form1.cs",
+              "RelativeToolTip": "Form1.cs",
+              "ViewState": "AgIAAE0AAAAAAAAAAAAAAFkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-24T10:27:45.145Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Form1.cs [Design]",
+              "DocumentMoniker": "E:\\script\\LIA\\SQLDatabaseViewer\\Form1.cs",
+              "RelativeDocumentMoniker": "Form1.cs",
+              "ToolTip": "E:\\script\\LIA\\SQLDatabaseViewer\\Form1.cs [Design]",
+              "RelativeToolTip": "Form1.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-24T10:27:30.569Z",
+              "EditorCaption": " [Design]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Form1.Designer.cs",
+              "DocumentMoniker": "E:\\script\\LIA\\SQLDatabaseViewer\\Form1.Designer.cs",
+              "RelativeDocumentMoniker": "Form1.Designer.cs",
+              "ToolTip": "E:\\script\\LIA\\SQLDatabaseViewer\\Form1.Designer.cs",
+              "RelativeToolTip": "Form1.Designer.cs",
+              "ViewState": "AgIAAPkAAAAAAAAAAAASwA0BAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-24T10:26:51.26Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
