@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\script\\LIA\\SQLDatabaseViewer\\SQLDatabaseViewer.csproj": {}
+    "E:\\LIA2\\SQLeditor\\SQLDatabaseViewer.csproj": {}
   },
   "projects": {
-    "E:\\script\\LIA\\SQLDatabaseViewer\\SQLDatabaseViewer.csproj": {
+    "E:\\LIA2\\SQLeditor\\SQLDatabaseViewer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\script\\LIA\\SQLDatabaseViewer\\SQLDatabaseViewer.csproj",
+        "projectUniqueName": "E:\\LIA2\\SQLeditor\\SQLDatabaseViewer.csproj",
         "projectName": "SQLDatabaseViewer",
-        "projectPath": "E:\\script\\LIA\\SQLDatabaseViewer\\SQLDatabaseViewer.csproj",
+        "projectPath": "E:\\LIA2\\SQLeditor\\SQLDatabaseViewer.csproj",
         "packagesPath": "C:\\Users\\Tobias\\.nuget\\packages\\",
-        "outputPath": "E:\\script\\LIA\\SQLDatabaseViewer\\obj\\",
+        "outputPath": "E:\\LIA2\\SQLeditor\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

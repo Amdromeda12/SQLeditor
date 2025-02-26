@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SQLDatabaseViewer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5758de8a5edae5daffad36c73f7da61158ccb562")]
 [assembly: System.Reflection.AssemblyProductAttribute("SQLDatabaseViewer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SQLDatabaseViewer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
