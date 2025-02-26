@@ -14,7 +14,7 @@ namespace SQLeditor
         private DatabaseHelper dbHelper;
         private string selectedDatabasePath = "";
         private string selectedResponseId = "";
-        private bool isLoadingResponseText = false;
+        private bool isClearingResponseText = false;
         private readonly SemaphoreSlim dbSemaphore = new SemaphoreSlim(1, 1);
 
         // Fields for full-table editing (Table Editor)
@@ -128,7 +128,6 @@ namespace SQLeditor
             {
                 AssignmentDataGridView.Rows.Clear();
                 ResponseDataGridView.Rows.Clear();
-                RMessageBox.Clear();
             }
         }
 
@@ -181,7 +180,6 @@ namespace SQLeditor
             else
             {
                 ResponseDataGridView.Rows.Clear();
-                RMessageBox.Clear();
             }
         }
 
@@ -199,7 +197,8 @@ namespace SQLeditor
 
                 if (dt.Rows.Count == 0)
                 {
-                    RMessageBox.Clear();
+                    selectedResponseId = "";
+                    RMessageBox.Clear();      
                 }
 
                 foreach (DataRow row in dt.Rows)
@@ -238,7 +237,6 @@ namespace SQLeditor
         {
             try
             {
-                isLoadingResponseText = true;
                 DataTable dt = await dbHelper.ExecuteQueryAsync("SELECT ResponseText FROM responses WHERE Id = @responseId",
                     new SQLiteParameter[] { new SQLiteParameter("@responseId", responseId) });
 
@@ -255,10 +253,6 @@ namespace SQLeditor
             catch (Exception ex)
             {
                 MessageBox.Show("Error loading response text: " + ex.Message);
-            }
-            finally
-            {
-                isLoadingResponseText = false;
             }
         }
 
@@ -373,7 +367,7 @@ namespace SQLeditor
         // Handle RMessageBox Text Change
         private async void RMessageBox_TextChanged(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(selectedResponseId) && !isLoadingResponseText)
+            if (!string.IsNullOrEmpty(selectedResponseId))
             {
                 await UpdateResponseTextAsync(selectedResponseId, RMessageBox.Text);
             }
