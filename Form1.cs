@@ -1,7 +1,10 @@
-﻿using System;
+﻿using SQLeditor.Models;
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -11,49 +14,102 @@ namespace SQLeditor
     public partial class Form1 : Form
     {
         // Existing fields for your main editing functionality…
-        private DatabaseHelper dbHelper;
-        private string selectedDatabasePath = "";
-        private string selectedResponseId = "";
-        private bool isClearingResponseText = false;
-        private readonly SemaphoreSlim dbSemaphore = new SemaphoreSlim(1, 1);
+        private DatabaseService _databaseService;
+        private string databasePath = "";
 
-        // Fields for full-table editing (Table Editor)
-        private DataTable coursesTable;
-        private DataTable assignmentsTable;
-        private DataTable responsesTable;
-        private SQLiteDataAdapter coursesAdapter;
-        private SQLiteDataAdapter assignmentsAdapter;
-        private SQLiteDataAdapter responsesAdapter;
-
-        private bool IsDatabaseOpen()
+        private bool IsDatabaseOpen(bool showMessage = true)
         {
-            return !string.IsNullOrEmpty(selectedDatabasePath) && dbHelper != null;
+            if (string.IsNullOrWhiteSpace(databasePath) || _databaseService == null)
+            {
+                if (showMessage)
+                {
+                    MessageBox.Show("Please open a database first.", "Database Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                return false;
+            }
+            return true;
         }
 
-        public Form1()
+        public Form1(DatabaseService databaseService)
         {
+            _databaseService = databaseService ?? throw new ArgumentNullException(nameof(databaseService), "DatabaseService cannot be null.");
             InitializeComponent();
+
+            CourseListView = new BrightIdeasSoftware.ObjectListView();
+            AssignmentListView = new BrightIdeasSoftware.ObjectListView();
+            ResponseListView = new BrightIdeasSoftware.ObjectListView();
+
+            InitializeObjectListViews();
             InitializeEventHandlers();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            // Disable everything initially if no valid database is set
+            SetDatabaseState(!string.IsNullOrEmpty(_databaseService?.DatabasePath));
+        }
+
+        private void InitializeObjectListViews()
+        {
+            // Ensure ObjectListViews are initialized before modifying them
+            CourseListView = new BrightIdeasSoftware.ObjectListView();
+            AssignmentListView = new BrightIdeasSoftware.ObjectListView();
+            ResponseListView = new BrightIdeasSoftware.ObjectListView();
+
+            // Define a better font (e.g., Segoe UI, 12pt for readability)
+            Font customFont = new Font("Segoe UI", 12, FontStyle.Regular);
+
+            foreach (var olv in new[] { CourseListView, AssignmentListView, ResponseListView })
+            {
+                olv.FullRowSelect = true;
+                olv.HideSelection = false;
+                olv.UseFiltering = true;
+                olv.View = View.Details;
+                olv.MultiSelect = false; // Allow only one selection
+                olv.Dock = DockStyle.Fill; // Fit to panel size
+                olv.ShowGroups = false; // Disable grouping for cleaner UI
+                olv.HeaderStyle = ColumnHeaderStyle.None; // Hide column titles
+                olv.Font = customFont; // Apply custom font
+            }
+
+            // Add Columns to each OLV
+            CourseListView.AllColumns.Add(new BrightIdeasSoftware.OLVColumn { AspectName = "CourseName", FillsFreeSpace = true });
+            AssignmentListView.AllColumns.Add(new BrightIdeasSoftware.OLVColumn { AspectName = "AssignmentTitle", FillsFreeSpace = true });
+            ResponseListView.AllColumns.Add(new BrightIdeasSoftware.OLVColumn { AspectName = "ResponseTitle", FillsFreeSpace = true });
+
+            // Apply the column configuration
+            CourseListView.RebuildColumns();
+            AssignmentListView.RebuildColumns();
+            ResponseListView.RebuildColumns();
+
+            // Add OLVs to the existing UI panels in the "Use" tab
+            panelCourses.Controls.Add(CourseListView);
+            panelAssignments.Controls.Add(AssignmentListView);
+            panelResponses.Controls.Add(ResponseListView);
         }
 
         private void InitializeEventHandlers()
         {
-            // Your existing event handler bindings
-            CourseDataGridView.SelectionChanged += CourseDataGridView_SelectionChanged;
-            AssignmentDataGridView.SelectionChanged += AssignmentDataGridView_SelectionChanged;
-            ResponseDataGridView.SelectionChanged += ResponseDataGridView_SelectionChanged;
-            CourseDataGridView.CellEndEdit += CourseDataGridView_CellEndEdit;
-            AssignmentDataGridView.CellEndEdit += AssignmentDataGridView_CellEndEdit;
-            ResponseDataGridView.CellEndEdit += ResponseDataGridView_CellEndEdit;
-            TablesTabControl.SelectedIndexChanged += TablesTabControl_SelectedIndexChanged;
-            RMessageBox.TextChanged += RMessageBox_TextChanged;
-            CourseDataGridView.KeyDown += DataGridView_KeyDown;
-            AssignmentDataGridView.KeyDown += DataGridView_KeyDown;
-            ResponseDataGridView.KeyDown += DataGridView_KeyDown;
+            // ObjectListView selection events
+            CourseListView.SelectedIndexChanged += CourseListView_SelectedIndexChanged;
+            AssignmentListView.SelectedIndexChanged += AssignmentListView_SelectedIndexChanged;
+            ResponseListView.SelectedIndexChanged += ResponseListView_SelectedIndexChanged;
 
+            // Buttons
+            NewCourseBtn.Click += NewCourseBtn_Click;
+            DeleteCourseBtn.Click += DeleteCourseBtn_Click;
+            EditCourseBtn.Click += EditCourseBtn_Click;
 
-            // Bind Save buttons for the Table Editor if not set in designer
-            SaveBtn.Click += SaveBtn_Click;
+            NewAssigmBtn.Click += NewAssigmBtn_Click;
+            DeleteAssigmBtn.Click += DeleteAssigmBtn_Click;
+            EditAssignmentBtn.Click += EditAssignmentBtn_Click;
+
+            NewRespBtn.Click += NewRespBtn_Click;
+            DeleteRespBtn.Click += DeleteRespBtn_Click;
+            EditResponseBtn.Click += EditResponseBtn_Click;
+
+            //to prevent tab navigation if no database is open
+            TablesTabControl.Selecting += TablesTabControl_Selecting;
         }
 
         private void DataGridView_KeyDown(object sender, KeyEventArgs e)
@@ -67,6 +123,12 @@ namespace SQLeditor
             }
         }
 
+        /// <summary>
+        /// Opens a SQLite database file and initializes the connection.
+        /// Updates the UI title and loads the courses into the ObjectListView.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">Event data.</param>
         private async void openDatabaseToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
@@ -76,333 +138,253 @@ namespace SQLeditor
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    selectedDatabasePath = openFileDialog.FileName;
-                    dbHelper = new DatabaseHelper(selectedDatabasePath);
-                    this.Text = $"SQLeditor | Loaded Database: \"{selectedDatabasePath}\"";
-                    await LoadCourses(); // Load courses for your main UI as before
+                    string selectedDatabasePath = openFileDialog.FileName; // ✅ Ensure variable is in scope
+
+                    if (!string.IsNullOrWhiteSpace(selectedDatabasePath))
+                    {
+                        _databaseService = new DatabaseService(selectedDatabasePath);
+                        databasePath = selectedDatabasePath;
+
+                        // ✅ Set the form title to show the selected database path
+                        this.Text = $"SQL Editor | Current Database: {databasePath}";
+
+
+
+                        SetDatabaseState(true);
+                        await LoadCoursesAsync();
+                        await LoadEditorDataAsync();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Invalid database file. Please select a valid SQLite database.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
         }
 
-        private async Task LoadCourses()
+        /// <summary>
+        /// Loads all courses from the database and updates the CourseListView.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private async Task LoadCoursesAsync()
         {
-
-            try
-            {
-                CourseDataGridView.Rows.Clear();
-                CourseDataGridView.Columns.Clear();
-                CourseDataGridView.Columns.Add("CourseName", string.Empty);
-
-                DataTable dt = await dbHelper.ExecuteQueryAsync("SELECT Id, CourseName FROM courses");
-                foreach (DataRow row in dt.Rows)
-                {
-                    DataGridViewRow dgvRow = new DataGridViewRow();
-                    dgvRow.CreateCells(CourseDataGridView, row["CourseName"]);
-                    dgvRow.Tag = row["Id"];
-                    CourseDataGridView.Rows.Add(dgvRow);
-                }
-                CourseDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-                CourseDataGridView.RowHeadersVisible = false;
-                CourseDataGridView.ColumnHeadersVisible = false;
-                CourseDataGridView.BorderStyle = BorderStyle.None;
-                CourseDataGridView.GridColor = Color.White;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error loading courses: " + ex.Message);
-            }
+            var courses = await _databaseService.GetCoursesAsync();
+            CourseListView.SetObjects(courses);
         }
 
-        private void CourseDataGridView_SelectionChanged(object sender, EventArgs e)
+        private async void CourseListView_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (CourseDataGridView.SelectedRows.Count > 0)
+            if (CourseListView.SelectedObject is Course selectedCourse)
             {
-                var selectedRow = CourseDataGridView.SelectedRows[0];
-                if (selectedRow.Tag != null)
-                {
-                    string courseId = selectedRow.Tag.ToString();
-                    LoadAssignments(courseId);
-                }
+                var assignments = await _databaseService.GetAssignmentsAsync(selectedCourse.Id);
+                AssignmentListView.SetObjects(assignments);
             }
             else
             {
-                AssignmentDataGridView.Rows.Clear();
-                ResponseDataGridView.Rows.Clear();
+                AssignmentListView.ClearObjects();
             }
+
+            ResponseListView.ClearObjects();
+            RMessageBox.Text = "";
         }
 
-        private async void LoadAssignments(string courseId)
+        private async void AssignmentListView_SelectedIndexChanged(object sender, EventArgs e)
         {
-            try
+            if (AssignmentListView.SelectedObject is Assignment selectedAssignment)
             {
-                AssignmentDataGridView.Rows.Clear();
-                AssignmentDataGridView.Columns.Clear();
-                AssignmentDataGridView.Columns.Add("AssignmentTitle", string.Empty);
-
-                DataTable dt = await dbHelper.ExecuteQueryAsync("SELECT Id, AssignmentTitle FROM assignments WHERE CourseId = @courseId",
-                    new SQLiteParameter[] { new SQLiteParameter("@courseId", courseId) });
-
-                if (dt.Rows.Count == 0)
-                {
-                    MessageBox.Show("No assignments found for this course.");
-                }
-
-                foreach (DataRow row in dt.Rows)
-                {
-                    DataGridViewRow dgvRow = new DataGridViewRow();
-                    dgvRow.CreateCells(AssignmentDataGridView, row["AssignmentTitle"]);
-                    dgvRow.Tag = row["Id"];
-                    AssignmentDataGridView.Rows.Add(dgvRow);
-                }
-                AssignmentDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-                AssignmentDataGridView.RowHeadersVisible = false;
-                AssignmentDataGridView.ColumnHeadersVisible = false;
-                AssignmentDataGridView.BorderStyle = BorderStyle.None;
-                AssignmentDataGridView.GridColor = Color.White;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error loading assignments: " + ex.Message);
-            }
-        }
-
-        private void AssignmentDataGridView_SelectionChanged(object sender, EventArgs e)
-        {
-            if (AssignmentDataGridView.SelectedRows.Count > 0)
-            {
-                var selectedRow = AssignmentDataGridView.SelectedRows[0];
-                if (selectedRow.Tag != null)
-                {
-                    string assignmentId = selectedRow.Tag.ToString();
-                    LoadResponses(assignmentId);
-                }
+                var responses = await _databaseService.GetResponsesAsync(selectedAssignment.Id);
+                ResponseListView.SetObjects(responses);
             }
             else
             {
-                ResponseDataGridView.Rows.Clear();
+                ResponseListView.ClearObjects();
+            }
+
+            RMessageBox.Text = "";
+        }
+
+        private async void ResponseListView_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (ResponseListView.SelectedObject is Response selectedResponse)
+            {
+                RMessageBox.Text = selectedResponse.ResponseText;
+            }
+            else
+            {
+                RMessageBox.Text = "";
             }
         }
 
-        private async void LoadResponses(string assignmentId)
+
+        /// <summary>
+        /// Handles the event for adding Or Editing or deleting a course or Assignment or Response.
+        /// Prompts the user for NeededData and adds it to the database.
+        /// Refreshes the lists in ObjectListView after adding.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">Event data.</param>
+        private async void NewCourseBtn_Click(object sender, EventArgs e)
         {
-            try
+            string courseName = Prompt.ShowDialog("Enter Course Name:", "New Course");
+            string courseDescription = Prompt.ShowDialog("Enter Course Description:", "New Course");
+
+            if (!string.IsNullOrEmpty(courseName) && !string.IsNullOrEmpty(courseDescription))
             {
-                ResponseDataGridView.Rows.Clear();
-                ResponseDataGridView.Columns.Clear();
-                ResponseDataGridView.Columns.Add("ResponseTitle", string.Empty);
-
-                DataTable dt = await dbHelper.ExecuteQueryAsync(
-                    "SELECT Id, ResponseTitle FROM responses WHERE AssignmentId = @assignmentId",
-                    new SQLiteParameter[] { new SQLiteParameter("@assignmentId", assignmentId) });
-
-                if (dt.Rows.Count == 0)
-                {
-                    selectedResponseId = "";
-                    RMessageBox.Clear();      
-                }
-
-                foreach (DataRow row in dt.Rows)
-                {
-                    DataGridViewRow dgvRow = new DataGridViewRow();
-                    dgvRow.CreateCells(ResponseDataGridView, row["ResponseTitle"]);
-                    dgvRow.Tag = row["Id"];
-                    ResponseDataGridView.Rows.Add(dgvRow);
-                }
-                ResponseDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-                ResponseDataGridView.RowHeadersVisible = false;
-                ResponseDataGridView.ColumnHeadersVisible = false;
-                ResponseDataGridView.BorderStyle = BorderStyle.None;
-                ResponseDataGridView.GridColor = Color.White;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error loading responses: " + ex.Message);
+                await _databaseService.AddCourseAsync(courseName, courseDescription);
+                var courses = await _databaseService.GetCoursesAsync();
+                CourseListView.SetObjects(courses); // Refresh OLV
+                await RefreshAllEditorDataAsync();
             }
         }
 
-        private void ResponseDataGridView_SelectionChanged(object sender, EventArgs e)
+        private async void NewAssigmBtn_Click(object sender, EventArgs e)
         {
-            if (ResponseDataGridView.SelectedRows.Count > 0)
+            if (CourseListView.SelectedObject is Course selectedCourse)
             {
-                var selectedRow = ResponseDataGridView.SelectedRows[0];
-                if (selectedRow.Tag != null)
-                {
-                    selectedResponseId = selectedRow.Tag.ToString();
-                    LoadResponseText(selectedResponseId);
-                }
-            }
-        }
+                string assignmentTitle = Prompt.ShowDialog("Enter Assignment Title:", "New Assignment");
+                string assignmentDescription = Prompt.ShowDialog("Enter Assignment Description:", "New Assignment");
+                string assignmentPositionStr = Prompt.ShowDialog("Enter Assignment Position:", "New Assignment");
 
-        private async void LoadResponseText(string responseId)
-        {
-            try
-            {
-                DataTable dt = await dbHelper.ExecuteQueryAsync("SELECT ResponseText FROM responses WHERE Id = @responseId",
-                    new SQLiteParameter[] { new SQLiteParameter("@responseId", responseId) });
-
-                if (dt.Rows.Count > 0)
+                if (!string.IsNullOrEmpty(assignmentTitle) && !string.IsNullOrEmpty(assignmentDescription) && int.TryParse(assignmentPositionStr, out int assignmentPosition))
                 {
-                    RMessageBox.Text = dt.Rows[0]["ResponseText"].ToString();
-                }
-                else
-                {
-                    RMessageBox.Clear();
-                    selectedResponseId = "";
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error loading response text: " + ex.Message);
-            }
-        }
-
-        // Handle Course Edit
-        private async void CourseDataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0)
-            {
-                string newCourseName = CourseDataGridView.Rows[e.RowIndex].Cells[0].Value?.ToString() ?? string.Empty;
-                string courseId = CourseDataGridView.Rows[e.RowIndex].Tag?.ToString() ?? string.Empty;
-                if (!string.IsNullOrEmpty(courseId))
-                {
-                    await UpdateCourseNameAsync(courseId, newCourseName);
+                    await _databaseService.AddAssignmentAsync(selectedCourse.Id, assignmentTitle, assignmentDescription, assignmentPosition);
+                    var assignments = await _databaseService.GetAssignmentsAsync(selectedCourse.Id);
+                    AssignmentListView.SetObjects(assignments); // Refresh OLV
+                    await RefreshAllEditorDataAsync();
                 }
             }
         }
 
-        private async Task UpdateCourseNameAsync(string courseId, string newCourseName)
+        private async void NewRespBtn_Click(object sender, EventArgs e)
         {
-            await dbSemaphore.WaitAsync();
-            try
+            if (AssignmentListView.SelectedObject is Assignment selectedAssignment)
             {
-                await dbHelper.ExecuteNonQueryAsync("UPDATE courses SET CourseName = @courseName WHERE Id = @courseId",
-                    new SQLiteParameter[]
+                string responseTitle = Prompt.ShowDialog("Enter Response Title:", "New Response");
+                string responseText = Prompt.ShowDialog("Enter Response Text:", "New Message");
+                if (!string.IsNullOrEmpty(responseTitle))
+                {
+                    await _databaseService.AddResponseAsync(selectedAssignment.Id, responseTitle, responseText);
+                    var responses = await _databaseService.GetResponsesAsync(selectedAssignment.Id);
+                    ResponseListView.SetObjects(responses); // Refresh OLV
+                    RMessageBox.Text = responseText.ToString();
+                    await RefreshAllEditorDataAsync();
+                }
+            }
+        }
+
+        private async void DeleteCourseBtn_Click(object sender, EventArgs e)
+        {
+            if (CourseListView.SelectedObject is Course selectedCourse)
+            {
+                DialogResult result = MessageBox.Show($"Delete {selectedCourse.CourseName}?", "Confirm", MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes)
+                {
+                    await _databaseService.DeleteCourseAsync(selectedCourse.Id);
+                    var courses = await _databaseService.GetCoursesAsync();
+                    CourseListView.SetObjects(courses); // Refresh OLV
+                    AssignmentListView.ClearObjects();
+                    ResponseListView.ClearObjects();
+                    await RefreshAllEditorDataAsync();
+                }
+            }
+        }
+
+        private async void DeleteAssigmBtn_Click(object sender, EventArgs e)
+        {
+            if (AssignmentListView.SelectedObject is Assignment selectedAssignment)
+            {
+                DialogResult result = MessageBox.Show($"Delete {selectedAssignment.AssignmentTitle}?", "Confirm", MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes)
+                {
+                    await _databaseService.DeleteAssignmentAsync(selectedAssignment.Id);
+                    var assignments = await _databaseService.GetAssignmentsAsync(selectedAssignment.CourseId);
+                    AssignmentListView.SetObjects(assignments); // Refresh OLV
+                    ResponseListView.ClearObjects();
+                    await RefreshAllEditorDataAsync();
+                }
+            }
+        }
+
+        private async void DeleteRespBtn_Click(object sender, EventArgs e)
+        {
+            if (ResponseListView.SelectedObject is Response selectedResponse)
+            {
+                DialogResult result = MessageBox.Show($"Delete {selectedResponse.ResponseTitle}?", "Confirm", MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes)
+                {
+                    await _databaseService.DeleteResponseAsync(selectedResponse.Id);
+                    var responses = await _databaseService.GetResponsesAsync(selectedResponse.AssignmentId);
+                    ResponseListView.SetObjects(responses); // Refresh OLV
+                    await RefreshAllEditorDataAsync();
+                }
+            }
+        }
+
+        private async void EditCourseBtn_Click(object sender, EventArgs e)
+        {
+            if (CourseListView.SelectedObject is Course selectedCourse)
+            {
+                string newCourseName = Prompt.ShowDialog("Enter New Course Name:", "Edit Course", selectedCourse.CourseName);
+                string newCourseDescription = Prompt.ShowDialog("Enter New Course Description:", "Edit Course", selectedCourse.CourseDescription);
+
+                if (!string.IsNullOrEmpty(newCourseName) && !string.IsNullOrEmpty(newCourseDescription))
+                {
+                    await _databaseService.UpdateCourseAsync(selectedCourse.Id, newCourseName, newCourseDescription);
+                    var courses = await _databaseService.GetCoursesAsync();
+                    CourseListView.SetObjects(courses); // Refresh OLV
+                    await RefreshAllEditorDataAsync();
+                }
+            }
+        }
+
+        private async void EditAssignmentBtn_Click(object sender, EventArgs e)
+        {
+            if (AssignmentListView.SelectedObject is Assignment selectedAssignment)
+            {
+                string newAssignmentTitle = Prompt.ShowDialog("Enter New Assignment Title:", "Edit Assignment", selectedAssignment.AssignmentTitle);
+                string newAssignmentDescription = Prompt.ShowDialog("Enter New Assignment Description:", "Edit Assignment", selectedAssignment.AssignmentDescription);
+                string newAssignmentPositionStr = Prompt.ShowDialog("Enter New Assignment Position:", "Edit Assignment", selectedAssignment.AssignmentPosition.ToString());
+
+                if (!string.IsNullOrEmpty(newAssignmentTitle) && !string.IsNullOrEmpty(newAssignmentDescription) && int.TryParse(newAssignmentPositionStr, out int newAssignmentPosition))
+                {
+                    await _databaseService.UpdateAssignmentAsync(selectedAssignment.Id, newAssignmentTitle, newAssignmentDescription, newAssignmentPosition);
+                    var assignments = await _databaseService.GetAssignmentsAsync(selectedAssignment.CourseId);
+                    AssignmentListView.SetObjects(assignments); // Refresh OLV
+                    await RefreshAllEditorDataAsync();
+                }
+            }
+        }
+
+        private async void EditResponseBtn_Click(object sender, EventArgs e)
+        {
+            if (ResponseListView.SelectedObject is Response selectedResponse)
+            {
+                string newResponseTitle = Prompt.ShowDialog("Enter New Response Title:", "Edit Response", selectedResponse.ResponseTitle);
+                string newResponseText = Prompt.ShowDialog("Enter New Message:", "Edit Response", selectedResponse.ResponseText);
+
+                if (!string.IsNullOrEmpty(newResponseTitle) && !string.IsNullOrEmpty(newResponseText))
+                {
+                    await _databaseService.UpdateResponseAsync(selectedResponse.Id, newResponseTitle, newResponseText);
+
+                    var responses = await _databaseService.GetResponsesAsync(selectedResponse.AssignmentId);
+                    ResponseListView.SetObjects(responses);
+
+                    var updatedResponse = responses.FirstOrDefault(r => r.Id == selectedResponse.Id);
+                    if (updatedResponse != null)
                     {
-                        new SQLiteParameter("@courseName", newCourseName),
-                        new SQLiteParameter("@courseId", courseId)
-                    });
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error updating course name: " + ex.Message);
-            }
-            finally
-            {
-                dbSemaphore.Release();
-            }
-        }
+                        ResponseListView.SelectObject(updatedResponse); // Select the updated response
+                        RMessageBox.Text = updatedResponse.ResponseText; // Update message box immediately
+                    }
 
-        // Handle Assignment Edit
-        private async void AssignmentDataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0)
-            {
-                string newAssignmentTitle = AssignmentDataGridView.Rows[e.RowIndex].Cells[0].Value?.ToString() ?? string.Empty;
-                string assignmentId = AssignmentDataGridView.Rows[e.RowIndex].Tag?.ToString() ?? string.Empty;
-                if (!string.IsNullOrEmpty(assignmentId))
-                {
-                    await UpdateAssignmentTitleAsync(assignmentId, newAssignmentTitle);
+                    await RefreshAllEditorDataAsync();
                 }
             }
         }
 
-        private async Task UpdateAssignmentTitleAsync(string assignmentId, string newAssignmentTitle)
-        {
-            await dbSemaphore.WaitAsync();
-            try
-            {
-                await dbHelper.ExecuteNonQueryAsync("UPDATE assignments SET AssignmentTitle = @assignmentTitle WHERE Id = @assignmentId",
-                    new SQLiteParameter[]
-                    {
-                        new SQLiteParameter("@assignmentTitle", newAssignmentTitle),
-                        new SQLiteParameter("@assignmentId", assignmentId)
-                    });
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error updating assignment title: " + ex.Message);
-            }
-            finally
-            {
-                dbSemaphore.Release();
-            }
-        }
 
-        // Handle Response Edit
-        private async void ResponseDataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0 && ResponseDataGridView.Rows[e.RowIndex].Tag != null)
-            {
-                string newResponseTitle = ResponseDataGridView.Rows[e.RowIndex].Cells[0].Value?.ToString() ?? string.Empty;
-                string responseId = ResponseDataGridView.Rows[e.RowIndex].Tag?.ToString() ?? string.Empty;
-                if (!string.IsNullOrEmpty(responseId))
-                {
-                    await UpdateResponseTitleAsync(responseId, newResponseTitle);
-                }
-            }
-        }
-
-        private async Task UpdateResponseTitleAsync(string responseId, string newResponseTitle)
-        {
-            await dbSemaphore.WaitAsync();
-            try
-            {
-                await dbHelper.ExecuteNonQueryAsync("UPDATE responses SET ResponseTitle = @responseTitle WHERE Id = @responseId",
-                    new SQLiteParameter[]
-                    {
-                        new SQLiteParameter("@responseTitle", newResponseTitle),
-                        new SQLiteParameter("@responseId", responseId)
-                    });
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error updating response title: " + ex.Message);
-            }
-            finally
-            {
-                dbSemaphore.Release();
-            }
-        }
-
-        // Handle RMessageBox Text Change
-        private async void RMessageBox_TextChanged(object sender, EventArgs e)
-        {
-            if (!string.IsNullOrEmpty(selectedResponseId))
-            {
-                await UpdateResponseTextAsync(selectedResponseId, RMessageBox.Text);
-            }
-        }
-
-        private async Task UpdateResponseTextAsync(string responseId, string newText)
-        {
-            await dbSemaphore.WaitAsync();
-            try
-            {
-                await dbHelper.ExecuteNonQueryAsync("UPDATE responses SET ResponseText = @responseText WHERE Id = @responseId",
-                    new SQLiteParameter[]
-                    {
-                        new SQLiteParameter("@responseText", newText),
-                        new SQLiteParameter("@responseId", responseId)
-                    });
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error updating response text: " + ex.Message);
-            }
-            finally
-            {
-                dbSemaphore.Release();
-            }
-        }
-
+        //Copy Text from The message field to clipboard
         private void CopyBtn_Click(object sender, EventArgs e)
         {
-            if (!IsDatabaseOpen())
-            {
-                MessageBox.Show("Please open a database first.");
-                return;
-            }
-
             if (!string.IsNullOrEmpty(RMessageBox.Text))
             {
                 Clipboard.SetText(RMessageBox.Text);
@@ -414,346 +396,271 @@ namespace SQLeditor
             }
         }
 
-        private async void NewCourseBtn_Click(object sender, EventArgs e)
-        {
-            if (!IsDatabaseOpen())
-            {
-                MessageBox.Show("Please open a database first.");
-                return;
-            }
 
-            string courseName = Prompt.ShowDialog("Enter Course Name:", "New Course");
-            string courseDescription = Prompt.ShowDialog("Enter Course Description:", "New Course");
-
-            if (!string.IsNullOrEmpty(courseName) && !string.IsNullOrEmpty(courseDescription))
-            {
-                await dbHelper.ExecuteNonQueryAsync(
-                    "INSERT INTO courses (CourseName, CourseDescription) VALUES (@courseName, @courseDescription)",
-                    new SQLiteParameter[]
-                    {
-                        new SQLiteParameter("@courseName", courseName),
-                        new SQLiteParameter("@courseDescription", courseDescription)
-                    });
-                MessageBox.Show("New course added successfully!");
-                await LoadCourses();
-            }
-            else
-            {
-                MessageBox.Show("Course name and description cannot be empty.");
-            }
-        }
-
-        private async void NewAssigmBtn_Click(object sender, EventArgs e)
-        {
-            if (!IsDatabaseOpen())
-            {
-                MessageBox.Show("Please open a database first.");
-                return;
-            }
-
-            if (CourseDataGridView.SelectedRows.Count > 0)
-            {
-                var selectedRow = CourseDataGridView.SelectedRows[0];
-                string courseId = selectedRow.Tag.ToString();
-
-                string assignmentTitle = Prompt.ShowDialog("Enter Assignment Title:", "New Assignment");
-                string assignmentDescription = Prompt.ShowDialog("Enter Assignment Description:", "New Assignment");
-                string assignmentPosition = Prompt.ShowDialog("Enter Assignment Position:", "New Assignment");
-
-                if (!string.IsNullOrEmpty(assignmentTitle) && !string.IsNullOrEmpty(assignmentDescription))
-                {
-                    await dbHelper.ExecuteNonQueryAsync(
-                        "INSERT INTO assignments (AssignmentTitle, AssignmentDescription, AssignmentPosition, CourseId) VALUES (@assignmentTitle, @assignmentDescription, @assignmentPosition, @courseId)",
-                        new SQLiteParameter[]
-                        {
-                            new SQLiteParameter("@assignmentTitle", assignmentTitle),
-                            new SQLiteParameter("@assignmentDescription", assignmentDescription),
-                            new SQLiteParameter("@assignmentPosition", assignmentPosition),
-                            new SQLiteParameter("@courseId", courseId)
-                        });
-                    MessageBox.Show("New assignment added successfully!");
-                    LoadAssignments(courseId);
-                }
-                else
-                {
-                    MessageBox.Show("Assignment title and description cannot be empty.");
-                }
-            }
-            else
-            {
-                MessageBox.Show("Please select a course first.");
-            }
-        }
-
-        private async void NewRespBtn_Click(object sender, EventArgs e)
-        {
-            if (!IsDatabaseOpen())
-            {
-                MessageBox.Show("Please open a database first.");
-                return;
-            }
-
-            if (AssignmentDataGridView.SelectedRows.Count > 0)
-            {
-                var selectedRow = AssignmentDataGridView.SelectedRows[0];
-                string assignmentId = selectedRow.Tag.ToString();
-
-                string responseTitle = Prompt.ShowDialog("Enter Response Title:", "New Response");
-                string responseText = Prompt.ShowDialog("Enter Response Text:", "New Response");
-
-                if (!string.IsNullOrEmpty(responseTitle) && !string.IsNullOrEmpty(responseText))
-                {
-                    await dbHelper.ExecuteNonQueryAsync(
-                        "INSERT INTO responses (ResponseTitle, ResponseText, AssignmentId) VALUES (@responseTitle, @responseText, @assignmentId)",
-                        new SQLiteParameter[]
-                        {
-                            new SQLiteParameter("@responseTitle", responseTitle),
-                            new SQLiteParameter("@responseText", responseText),
-                            new SQLiteParameter("@assignmentId", assignmentId)
-                        });
-                    MessageBox.Show("New response added successfully!");
-                    LoadResponses(assignmentId);
-                }
-                else
-                {
-                    MessageBox.Show("Response title and text cannot be empty.");
-                }
-            }
-            else
-            {
-                MessageBox.Show("Please select an assignment first.");
-            }
-        }
-
-        private async void DeleteCourseBtn_Click(object sender, EventArgs e)
-        {
-            if (!IsDatabaseOpen())
-            {
-                MessageBox.Show("Please open a database first.");
-                return;
-            }
-
-            if (CourseDataGridView.SelectedRows.Count > 0)
-            {
-                var selectedRow = CourseDataGridView.SelectedRows[0];
-                string courseId = selectedRow.Tag?.ToString() ?? string.Empty;
-
-                if (!string.IsNullOrEmpty(courseId))
-                {
-                    DialogResult result = MessageBox.Show("Are you sure you want to delete this course and all related assignments and responses?",
-                                                          "Delete Course",
-                                                          MessageBoxButtons.YesNo,
-                                                          MessageBoxIcon.Warning);
-                    if (result == DialogResult.Yes)
-                    {
-                        await dbHelper.ExecuteNonQueryAsync(
-                            "DELETE FROM responses WHERE AssignmentId IN (SELECT Id FROM assignments WHERE CourseId = @courseId); " +
-                            "DELETE FROM assignments WHERE CourseId = @courseId; " +
-                            "DELETE FROM courses WHERE Id = @courseId;",
-                            new SQLiteParameter[] { new SQLiteParameter("@courseId", courseId) });
-
-                        MessageBox.Show("Course and all related assignments and responses deleted successfully.");
-                        RMessageBox.Clear();
-                        await LoadCourses();
-                    }
-                }
-            }
-            else
-            {
-                MessageBox.Show("Please select a course to delete.");
-            }
-        }
-
-        private async void DeleteAssigmBtn_Click(object sender, EventArgs e)
-        {
-            if (!IsDatabaseOpen())
-            {
-                MessageBox.Show("Please open a database first.");
-                return;
-            }
-
-            if (AssignmentDataGridView.SelectedRows.Count > 0)
-            {
-                var selectedRow = AssignmentDataGridView.SelectedRows[0];
-                string assignmentId = selectedRow.Tag?.ToString() ?? string.Empty;
-
-                if (!string.IsNullOrEmpty(assignmentId))
-                {
-                    DialogResult result = MessageBox.Show("Are you sure you want to delete this assignment and all related responses?",
-                                                          "Delete Assignment",
-                                                          MessageBoxButtons.YesNo,
-                                                          MessageBoxIcon.Warning);
-                    if (result == DialogResult.Yes)
-                    {
-                        await dbHelper.ExecuteNonQueryAsync(
-                            "DELETE FROM responses WHERE AssignmentId = @assignmentId; " +
-                            "DELETE FROM assignments WHERE Id = @assignmentId;",
-                            new SQLiteParameter[] { new SQLiteParameter("@assignmentId", assignmentId) });
-
-                        MessageBox.Show("Assignment and all related responses deleted successfully.");
-                        RMessageBox.Clear();
-                        LoadAssignments(CourseDataGridView.SelectedRows[0].Tag.ToString());
-                    }
-                }
-            }
-            else
-            {
-                MessageBox.Show("Please select an assignment to delete.");
-            }
-        }
-
-        private async void DeleteRespBtn_Click(object sender, EventArgs e)
-        {
-            if (!IsDatabaseOpen())
-            {
-                MessageBox.Show("Please open a database first.");
-                return;
-            }
-
-            if (ResponseDataGridView.SelectedRows.Count > 0)
-            {
-                var selectedRow = ResponseDataGridView.SelectedRows[0];
-                string responseId = selectedRow.Tag?.ToString() ?? string.Empty;
-
-                if (!string.IsNullOrEmpty(responseId))
-                {
-                    DialogResult result = MessageBox.Show("Are you sure you want to delete this response?", "Delete Response", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                    if (result == DialogResult.Yes)
-                    {
-                        await dbHelper.ExecuteNonQueryAsync(
-                            "DELETE FROM responses WHERE Id = @responseId",
-                            new SQLiteParameter[] { new SQLiteParameter("@responseId", responseId) });
-
-                        MessageBox.Show("Response deleted successfully.");
-                        RMessageBox.Clear();
-                        // Refresh responses for the currently selected assignment
-                        if (AssignmentDataGridView.SelectedRows.Count > 0)
-                        {
-                            LoadResponses(AssignmentDataGridView.SelectedRows[0].Tag.ToString());
-                        }
-                    }
-                }
-            }
-            else
-            {
-                MessageBox.Show("Please select a response to delete.");
-            }
-        }
-
+        /// <summary>
+        /// Loads all courses, assignments, and responses into their respective DataGridViews.
+        /// </summary>
         private async Task LoadEditorDataAsync()
         {
             try
             {
-                // Load courses table
-                coursesTable = await dbHelper.ExecuteQueryAsync("SELECT * FROM courses");
-                dataGridViewCoursesEditor.DataSource = coursesTable;
-                dataGridViewCoursesEditor.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-                dataGridViewCoursesEditor.AutoGenerateColumns = true; // Ensure columns are auto-generated
+                // ✅ Load Courses Table
+                var courses = await _databaseService.GetCoursesAsync();
+                dataGridViewCoursesEditor.DataSource = new BindingSource { DataSource = courses };
 
-                // Load assignments table
-                assignmentsTable = await dbHelper.ExecuteQueryAsync("SELECT * FROM assignments");
-                dataGridViewAssignmentsEditor.DataSource = assignmentsTable;
-                dataGridViewAssignmentsEditor.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-                dataGridViewAssignmentsEditor.AutoGenerateColumns = true;
+                // ✅ Load Assignments Table
+                var assignments = await _databaseService.GetAllAssignmentsAsync(); // Fetch all assignments
+                dataGridViewAssignmentsEditor.DataSource = new BindingSource { DataSource = assignments };
 
-                // Load responses table
-                responsesTable = await dbHelper.ExecuteQueryAsync("SELECT * FROM responses");
-                dataGridViewResponsesEditor.DataSource = responsesTable;
-                dataGridViewResponsesEditor.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-                dataGridViewResponsesEditor.AutoGenerateColumns = true;
+                // ✅ Load Responses Table
+                var responses = await _databaseService.GetAllResponsesAsync(); // 🔥 Fetch all responses
+                dataGridViewResponsesEditor.DataSource = new BindingSource { DataSource = responses };
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error loading table data: " + ex.Message);
+                MessageBox.Show($"Error loading table data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+        /// <summary>
+        /// Saves changes to the currently selected DataGridView.
+        /// </summary>
         private async void SaveBtn_Click(object sender, EventArgs e)
         {
-            if (!IsDatabaseOpen())
+            if (!IsDatabaseOpen()) return;
+
+            switch (TablesTabControl.SelectedTab.Name)
             {
-                MessageBox.Show("Please open a database first.");
-                return;
-            }
-                
-            if (TablesTabControl.SelectedTab == tabPageCourses)
-            {
-                await SaveCoursesAsync();
-            }
-            else if (TablesTabControl.SelectedTab == tabPageAssignments)
-            {
-                await SaveAssignmentsAsync();
-            }
-            else if (TablesTabControl.SelectedTab == tabPageResponses)
-            {
-                await SaveResponsesAsync();
+                case "tabPageCourses":
+                    await SaveCoursesAsync();
+                    await RefreshAllEditorDataAsync();
+                    break;
+                case "tabPageAssignments":
+                    await SaveAssignmentsAsync();
+                    await RefreshAllEditorDataAsync();
+                    break;
+                case "tabPageResponses":
+                    await SaveResponsesAsync();
+                    await RefreshAllEditorDataAsync();
+                    break;
             }
         }
 
+        /// <summary>
+        /// Saves changes made in the Courses DataGridView.
+        /// </summary>
         private async Task SaveCoursesAsync()
         {
             try
             {
-                // Create a data adapter and command builder for courses
-                SQLiteDataAdapter adapter = new SQLiteDataAdapter("SELECT * FROM courses", dbHelper.ConnectionString);
-                SQLiteCommandBuilder builder = new SQLiteCommandBuilder(adapter);
-                await Task.Run(() => adapter.Update(coursesTable));
+                var courses = (List<Course>)((BindingSource)dataGridViewCoursesEditor.DataSource).DataSource;
+                foreach (var course in courses)
+                {
+                    if (course.Id == 0)
+                        await _databaseService.AddCourseAsync(course.CourseName, course.CourseDescription);
+                    else
+                        await _databaseService.UpdateCourseAsync(course.Id, course.CourseName, course.CourseDescription);
+                }
+
                 MessageBox.Show("Courses saved successfully!");
+                await RefreshEditorDataAsync(); // 🔥 Refresh without tab switch
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error saving courses: " + ex.Message);
+                MessageBox.Show($"Error saving courses: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+        /// <summary>
+        /// Saves changes made in the Assignments DataGridView.
+        /// </summary>
         private async Task SaveAssignmentsAsync()
         {
             try
             {
-                // Create a data adapter and command builder for assignments
-                SQLiteDataAdapter adapter = new SQLiteDataAdapter("SELECT * FROM assignments", dbHelper.ConnectionString);
-                SQLiteCommandBuilder builder = new SQLiteCommandBuilder(adapter);
-                await Task.Run(() => adapter.Update(assignmentsTable));
+                var assignments = (List<Assignment>)((BindingSource)dataGridViewAssignmentsEditor.DataSource).DataSource;
+                foreach (var assignment in assignments)
+                {
+                    if (assignment.Id == 0)
+                        await _databaseService.AddAssignmentAsync(assignment.CourseId, assignment.AssignmentTitle, assignment.AssignmentDescription, assignment.AssignmentPosition);
+                    else
+                        await _databaseService.UpdateAssignmentAsync(assignment.Id, assignment.AssignmentTitle, assignment.AssignmentDescription, assignment.AssignmentPosition);
+                }
+
                 MessageBox.Show("Assignments saved successfully!");
+                await RefreshEditorDataAsync(); // 🔥 Refresh without tab switch
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error saving assignments: " + ex.Message);
+                MessageBox.Show($"Error saving assignments: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+        /// <summary>
+        /// Saves changes made in the Responses DataGridView.
+        /// </summary>
         private async Task SaveResponsesAsync()
         {
             try
             {
-                // Create a data adapter and command builder for responses
-                SQLiteDataAdapter adapter = new SQLiteDataAdapter("SELECT * FROM responses", dbHelper.ConnectionString);
-                SQLiteCommandBuilder builder = new SQLiteCommandBuilder(adapter);
-                await Task.Run(() => adapter.Update(responsesTable));
+                var responses = (List<Response>)((BindingSource)dataGridViewResponsesEditor.DataSource).DataSource;
+                foreach (var response in responses)
+                {
+                    if (response.Id == 0)
+                        await _databaseService.AddResponseAsync(response.AssignmentId, response.ResponseTitle, response.ResponseText);
+                    else
+                        await _databaseService.UpdateResponseAsync(response.Id, response.ResponseTitle, response.ResponseText);
+                }
+
                 MessageBox.Show("Responses saved successfully!");
+                await RefreshEditorDataAsync(); // 🔥 Refresh without tab switch
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error saving responses: " + ex.Message);
+                MessageBox.Show($"Error saving responses: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+        /// <summary>
+        /// Handles tab switching and reloads data for the selected tab.
+        /// </summary>
         private async void TablesTabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (!IsDatabaseOpen())
+            if (_databaseService == null)
             {
-                MessageBox.Show("Please open a database first.");
-                return;
+                return; // Prevent error when no database is open
             }
 
-            // Assume the editor tabs are named: tabPageCourses, tabPageAssignments, tabPageResponses.
-            // Adjust as needed.
-            if (TablesTabControl.SelectedTab == tabPageCourses ||
-                TablesTabControl.SelectedTab == tabPageAssignments ||
-                TablesTabControl.SelectedTab == tabPageResponses)
+            await RefreshEditorDataAsync();
+            await RefreshAllEditorDataAsync();
+
+        }
+
+        /// <summary>
+        /// Refreshes data for the currently selected tab without requiring a tab switch.
+        /// </summary>
+        private async Task RefreshEditorDataAsync()
+        {
+            if (!IsDatabaseOpen())
+                return;
+
+            switch (TablesTabControl.SelectedTab.Name)
             {
-                await LoadEditorDataAsync();
+                case "tabPageCourses":
+                    var courses = await _databaseService.GetCoursesAsync();
+                    dataGridViewCoursesEditor.DataSource = new BindingSource { DataSource = courses };
+                    break;
+
+                case "tabPageAssignments":
+                    var assignments = await _databaseService.GetAllAssignmentsAsync();
+                    dataGridViewAssignmentsEditor.DataSource = new BindingSource { DataSource = assignments };
+                    break;
+
+                case "tabPageResponses":
+                    var responses = await _databaseService.GetAllResponsesAsync();
+                    dataGridViewResponsesEditor.DataSource = new BindingSource { DataSource = responses };
+                    break;
             }
         }
+
+        /// <summary>
+        /// Enables or disables UI elements based on whether a database is loaded.
+        /// </summary>
+        private void SetDatabaseState(bool isEnabled)
+        {
+            if (_databaseService == null || string.IsNullOrWhiteSpace(databasePath))
+            {
+                Console.WriteLine("Database is null or empty. Disabling UI.");
+                isEnabled = false;
+            }
+            else
+            {
+                Console.WriteLine("Database is open. Enabling UI.");
+            }
+
+            // ✅ Enable/Disable buttons
+            NewCourseBtn.Enabled = isEnabled;
+            EditCourseBtn.Enabled = isEnabled;
+            DeleteCourseBtn.Enabled = isEnabled;
+
+            NewAssigmBtn.Enabled = isEnabled;
+            EditAssignmentBtn.Enabled = isEnabled;
+            DeleteAssigmBtn.Enabled = isEnabled;
+
+            NewRespBtn.Enabled = isEnabled;
+            EditResponseBtn.Enabled = isEnabled;
+            DeleteRespBtn.Enabled = isEnabled;
+
+            SaveBtn.Enabled = isEnabled;
+            CopyBtn.Enabled = isEnabled;
+
+            // ✅ Enable/Disable ObjectListViews
+            CourseListView.Enabled = isEnabled;
+            AssignmentListView.Enabled = isEnabled;
+            ResponseListView.Enabled = isEnabled;
+
+            dataGridViewCoursesEditor.Enabled = isEnabled;
+            dataGridViewAssignmentsEditor.Enabled = isEnabled;
+            dataGridViewResponsesEditor.Enabled = isEnabled;
+
+            // ✅ Enable/Disable Tabs
+            foreach (TabPage tab in TablesTabControl.TabPages)
+            {
+                if (tab.Name != "tabPageDatabase") // Prevent disabling database selection tab
+                {
+                    tab.Enabled = isEnabled;
+                }
+            }
+
+            TablesTabControl.Enabled = isEnabled; // ✅ Ensure the whole tab control is enabled
+            Console.WriteLine($"UI set to {(isEnabled ? "Enabled" : "Disabled")}. Tabs are now {(isEnabled ? "enabled" : "disabled")}.");
+        }
+
+        private void TablesTabControl_Selecting(object sender, TabControlCancelEventArgs e)
+        {
+            // Ensure the database is open, otherwise prevent tab switching
+            if (!IsDatabaseOpen(false))
+            {
+                // Double-check your actual tab name in the Designer file
+                if (e.TabPage != null && e.TabPage.Name != "Use") // ✅ Ensure correct tab name
+                {
+                    Console.WriteLine("Preventing tab switch. Database is not open.");
+                    e.Cancel = true; // ✅ Prevents tab switching
+                    MessageBox.Show("Please open a database first.", "Database Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+        }
+
+        private async Task RefreshAllEditorDataAsync()
+        {
+            Console.WriteLine("Refreshing all editor data...");
+
+            if (!IsDatabaseOpen())
+                return;
+
+            try
+            {
+                // ✅ Load Courses Table
+                var courses = await _databaseService.GetCoursesAsync();
+                CourseListView.SetObjects(courses);
+                dataGridViewCoursesEditor.DataSource = new BindingSource { DataSource = courses };
+                TablesTabControl.SelectedTab.Name = "tabPageCourses";
+
+                // ✅ Load Assignments Table
+                var assignments = await _databaseService.GetAllAssignmentsAsync();
+                dataGridViewAssignmentsEditor.DataSource = new BindingSource { DataSource = assignments };
+
+                // ✅ Load Responses Table
+                var responses = await _databaseService.GetAllResponsesAsync();
+                dataGridViewResponsesEditor.DataSource = new BindingSource { DataSource = responses };
+
+                Console.WriteLine("All editor data refreshed successfully.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error refreshing editor data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
     }
 }

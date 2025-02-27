@@ -24,13 +24,11 @@ bld/
 .vscode/
 
 ## NuGet packages
-packages/
 *.nupkg
 project.lock.json
 project.assets.json
 
-## Database and dependency files
-*.db
+## Database and dependency files (Keeping database files)
 *.db-shm
 *.db-wal
 
@@ -39,8 +37,6 @@ project.assets.json
 *.vspscc
 *.pidb
 *.sdf
-*.sqlite
-*.sqlite3
 *.swp
 
 ## Temporary files
