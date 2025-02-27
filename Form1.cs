@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Serilog;
 
 namespace SQLeditor
 {
@@ -41,10 +42,14 @@ namespace SQLeditor
 
             InitializeObjectListViews();
             InitializeEventHandlers();
+
+            Log.Information("Form1 initialized.");
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            Log.Information("Form1 loaded.");
+
             // Disable everything initially if no valid database is set
             SetDatabaseState(!string.IsNullOrEmpty(_databaseService?.DatabasePath));
         }
@@ -142,6 +147,9 @@ namespace SQLeditor
 
                     if (!string.IsNullOrWhiteSpace(selectedDatabasePath))
                     {
+                        Log.Information($"Opening database: {selectedDatabasePath}");
+
+
                         _databaseService = new DatabaseService(selectedDatabasePath);
                         databasePath = selectedDatabasePath;
 
@@ -156,6 +164,7 @@ namespace SQLeditor
                     }
                     else
                     {
+                        Log.Warning("Invalid database selected.");
                         MessageBox.Show("Invalid database file. Please select a valid SQLite database.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
@@ -230,6 +239,8 @@ namespace SQLeditor
 
             if (!string.IsNullOrEmpty(courseName) && !string.IsNullOrEmpty(courseDescription))
             {
+                Log.Information($"Adding new course: {courseName}");
+
                 await _databaseService.AddCourseAsync(courseName, courseDescription);
                 var courses = await _databaseService.GetCoursesAsync();
                 CourseListView.SetObjects(courses); // Refresh OLV
@@ -247,6 +258,8 @@ namespace SQLeditor
 
                 if (!string.IsNullOrEmpty(assignmentTitle) && !string.IsNullOrEmpty(assignmentDescription) && int.TryParse(assignmentPositionStr, out int assignmentPosition))
                 {
+                    Log.Information($"Adding new assignment: {assignmentTitle}");
+
                     await _databaseService.AddAssignmentAsync(selectedCourse.Id, assignmentTitle, assignmentDescription, assignmentPosition);
                     var assignments = await _databaseService.GetAssignmentsAsync(selectedCourse.Id);
                     AssignmentListView.SetObjects(assignments); // Refresh OLV
@@ -263,6 +276,8 @@ namespace SQLeditor
                 string responseText = Prompt.ShowDialog("Enter Response Text:", "New Message");
                 if (!string.IsNullOrEmpty(responseTitle))
                 {
+                    Log.Information($"Adding new response: {responseTitle}");
+
                     await _databaseService.AddResponseAsync(selectedAssignment.Id, responseTitle, responseText);
                     var responses = await _databaseService.GetResponsesAsync(selectedAssignment.Id);
                     ResponseListView.SetObjects(responses); // Refresh OLV
@@ -279,12 +294,15 @@ namespace SQLeditor
                 DialogResult result = MessageBox.Show($"Delete {selectedCourse.CourseName}?", "Confirm", MessageBoxButtons.YesNo);
                 if (result == DialogResult.Yes)
                 {
+                    Log.Information($"Deleting course: {selectedCourse.CourseName}");
+
                     await _databaseService.DeleteCourseAsync(selectedCourse.Id);
                     var courses = await _databaseService.GetCoursesAsync();
                     CourseListView.SetObjects(courses); // Refresh OLV
                     AssignmentListView.ClearObjects();
                     ResponseListView.ClearObjects();
                     await RefreshAllEditorDataAsync();
+                    RMessageBox.Text = "";
                 }
             }
         }
@@ -296,11 +314,14 @@ namespace SQLeditor
                 DialogResult result = MessageBox.Show($"Delete {selectedAssignment.AssignmentTitle}?", "Confirm", MessageBoxButtons.YesNo);
                 if (result == DialogResult.Yes)
                 {
+                    Log.Information($"Deleting Assignment: {selectedAssignment.AssignmentTitle}");
+
                     await _databaseService.DeleteAssignmentAsync(selectedAssignment.Id);
                     var assignments = await _databaseService.GetAssignmentsAsync(selectedAssignment.CourseId);
                     AssignmentListView.SetObjects(assignments); // Refresh OLV
                     ResponseListView.ClearObjects();
                     await RefreshAllEditorDataAsync();
+                    RMessageBox.Text = "";
                 }
             }
         }
@@ -312,10 +333,14 @@ namespace SQLeditor
                 DialogResult result = MessageBox.Show($"Delete {selectedResponse.ResponseTitle}?", "Confirm", MessageBoxButtons.YesNo);
                 if (result == DialogResult.Yes)
                 {
+                    Log.Information($"Deleting Response: {selectedResponse.ResponseTitle}");
+
+
                     await _databaseService.DeleteResponseAsync(selectedResponse.Id);
                     var responses = await _databaseService.GetResponsesAsync(selectedResponse.AssignmentId);
                     ResponseListView.SetObjects(responses); // Refresh OLV
                     await RefreshAllEditorDataAsync();
+                    RMessageBox.Text = "";
                 }
             }
         }
@@ -329,6 +354,8 @@ namespace SQLeditor
 
                 if (!string.IsNullOrEmpty(newCourseName) && !string.IsNullOrEmpty(newCourseDescription))
                 {
+                    Log.Information($"Editing Course: {newCourseName}");
+
                     await _databaseService.UpdateCourseAsync(selectedCourse.Id, newCourseName, newCourseDescription);
                     var courses = await _databaseService.GetCoursesAsync();
                     CourseListView.SetObjects(courses); // Refresh OLV
@@ -347,6 +374,8 @@ namespace SQLeditor
 
                 if (!string.IsNullOrEmpty(newAssignmentTitle) && !string.IsNullOrEmpty(newAssignmentDescription) && int.TryParse(newAssignmentPositionStr, out int newAssignmentPosition))
                 {
+                    Log.Information($"Editing Assignment: {newAssignmentTitle}");
+
                     await _databaseService.UpdateAssignmentAsync(selectedAssignment.Id, newAssignmentTitle, newAssignmentDescription, newAssignmentPosition);
                     var assignments = await _databaseService.GetAssignmentsAsync(selectedAssignment.CourseId);
                     AssignmentListView.SetObjects(assignments); // Refresh OLV
@@ -364,6 +393,8 @@ namespace SQLeditor
 
                 if (!string.IsNullOrEmpty(newResponseTitle) && !string.IsNullOrEmpty(newResponseText))
                 {
+                    Log.Information($"Editing Response: {newResponseTitle}");
+
                     await _databaseService.UpdateResponseAsync(selectedResponse.Id, newResponseTitle, newResponseText);
 
                     var responses = await _databaseService.GetResponsesAsync(selectedResponse.AssignmentId);
@@ -429,6 +460,8 @@ namespace SQLeditor
         {
             if (!IsDatabaseOpen()) return;
 
+            Log.Information($"Saving changes in tab: {TablesTabControl.SelectedTab.Name}");
+
             switch (TablesTabControl.SelectedTab.Name)
             {
                 case "tabPageCourses":
@@ -453,6 +486,7 @@ namespace SQLeditor
         {
             try
             {
+                Log.Information("Saving courses...");
                 var courses = (List<Course>)((BindingSource)dataGridViewCoursesEditor.DataSource).DataSource;
                 foreach (var course in courses)
                 {
@@ -464,6 +498,7 @@ namespace SQLeditor
 
                 MessageBox.Show("Courses saved successfully!");
                 await RefreshEditorDataAsync(); // 🔥 Refresh without tab switch
+                Log.Information("Courses saved successfully.");
             }
             catch (Exception ex)
             {
@@ -541,6 +576,7 @@ namespace SQLeditor
         /// </summary>
         private async Task RefreshEditorDataAsync()
         {
+            Log.Information("Refreshing all editor data...");
             if (!IsDatabaseOpen())
                 return;
 
@@ -549,16 +585,19 @@ namespace SQLeditor
                 case "tabPageCourses":
                     var courses = await _databaseService.GetCoursesAsync();
                     dataGridViewCoursesEditor.DataSource = new BindingSource { DataSource = courses };
+                    Log.Information(" editor data refreshed successfully.");
                     break;
 
                 case "tabPageAssignments":
                     var assignments = await _databaseService.GetAllAssignmentsAsync();
                     dataGridViewAssignmentsEditor.DataSource = new BindingSource { DataSource = assignments };
+                    Log.Information(" editor data refreshed successfully.");
                     break;
 
                 case "tabPageResponses":
                     var responses = await _databaseService.GetAllResponsesAsync();
                     dataGridViewResponsesEditor.DataSource = new BindingSource { DataSource = responses };
+                    Log.Information(" editor data refreshed successfully.");
                     break;
             }
         }
@@ -568,6 +607,7 @@ namespace SQLeditor
         /// </summary>
         private void SetDatabaseState(bool isEnabled)
         {
+
             if (_databaseService == null || string.IsNullOrWhiteSpace(databasePath))
             {
                 Console.WriteLine("Database is null or empty. Disabling UI.");
@@ -633,7 +673,9 @@ namespace SQLeditor
 
         private async Task RefreshAllEditorDataAsync()
         {
+
             Console.WriteLine("Refreshing all editor data...");
+            Log.Information("Refreshing all editor data...");
 
             if (!IsDatabaseOpen())
                 return;
@@ -655,6 +697,7 @@ namespace SQLeditor
                 dataGridViewResponsesEditor.DataSource = new BindingSource { DataSource = responses };
 
                 Console.WriteLine("All editor data refreshed successfully.");
+                Log.Information("All editor data refreshed successfully.");
             }
             catch (Exception ex)
             {
