@@ -45,6 +45,17 @@
             this.RMessageBox = new System.Windows.Forms.RichTextBox();
             this.panelCourses = new System.Windows.Forms.Panel();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.DeleteCourseBtn = new System.Windows.Forms.Button();
+            this.EditCourseBtn = new System.Windows.Forms.Button();
+            this.NewCourseBtn = new System.Windows.Forms.Button();
+            this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
+            this.DeleteAssigmBtn = new System.Windows.Forms.Button();
+            this.EditAssignmentBtn = new System.Windows.Forms.Button();
+            this.NewAssigmBtn = new System.Windows.Forms.Button();
+            this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
+            this.DeleteRespBtn = new System.Windows.Forms.Button();
+            this.EditResponseBtn = new System.Windows.Forms.Button();
+            this.NewRespBtn = new System.Windows.Forms.Button();
             this.Database = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.TablesTabControl = new System.Windows.Forms.TabControl();
@@ -60,17 +71,6 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.NewCourseBtn = new System.Windows.Forms.Button();
-            this.EditCourseBtn = new System.Windows.Forms.Button();
-            this.DeleteCourseBtn = new System.Windows.Forms.Button();
-            this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
-            this.NewAssigmBtn = new System.Windows.Forms.Button();
-            this.EditAssignmentBtn = new System.Windows.Forms.Button();
-            this.DeleteAssigmBtn = new System.Windows.Forms.Button();
-            this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
-            this.NewRespBtn = new System.Windows.Forms.Button();
-            this.EditResponseBtn = new System.Windows.Forms.Button();
-            this.DeleteRespBtn = new System.Windows.Forms.Button();
             this.TabControl.SuspendLayout();
             this.Use.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -79,6 +79,8 @@
             this.panel1.SuspendLayout();
             this.panel4.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
+            this.tableLayoutPanel4.SuspendLayout();
+            this.tableLayoutPanel5.SuspendLayout();
             this.Database.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.TablesTabControl.SuspendLayout();
@@ -90,8 +92,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewResponsesEditor)).BeginInit();
             this.panel8.SuspendLayout();
             this.menuStrip1.SuspendLayout();
-            this.tableLayoutPanel4.SuspendLayout();
-            this.tableLayoutPanel5.SuspendLayout();
             this.SuspendLayout();
             // 
             // TabControl
@@ -309,6 +309,153 @@
             this.tableLayoutPanel3.Size = new System.Drawing.Size(151, 32);
             this.tableLayoutPanel3.TabIndex = 20;
             // 
+            // DeleteCourseBtn
+            // 
+            this.DeleteCourseBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.DeleteCourseBtn.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.DeleteCourseBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DeleteCourseBtn.ForeColor = System.Drawing.Color.Black;
+            this.DeleteCourseBtn.Location = new System.Drawing.Point(103, 3);
+            this.DeleteCourseBtn.Name = "DeleteCourseBtn";
+            this.DeleteCourseBtn.Size = new System.Drawing.Size(45, 26);
+            this.DeleteCourseBtn.TabIndex = 24;
+            this.DeleteCourseBtn.Text = "Delete";
+            this.DeleteCourseBtn.UseVisualStyleBackColor = false;
+            // 
+            // EditCourseBtn
+            // 
+            this.EditCourseBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.EditCourseBtn.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.EditCourseBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.EditCourseBtn.ForeColor = System.Drawing.Color.Black;
+            this.EditCourseBtn.Location = new System.Drawing.Point(53, 3);
+            this.EditCourseBtn.Name = "EditCourseBtn";
+            this.EditCourseBtn.Size = new System.Drawing.Size(44, 26);
+            this.EditCourseBtn.TabIndex = 23;
+            this.EditCourseBtn.Text = "Edit";
+            this.EditCourseBtn.UseVisualStyleBackColor = false;
+            // 
+            // NewCourseBtn
+            // 
+            this.NewCourseBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.NewCourseBtn.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.NewCourseBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.NewCourseBtn.ForeColor = System.Drawing.Color.Black;
+            this.NewCourseBtn.Location = new System.Drawing.Point(3, 3);
+            this.NewCourseBtn.Name = "NewCourseBtn";
+            this.NewCourseBtn.Size = new System.Drawing.Size(44, 26);
+            this.NewCourseBtn.TabIndex = 22;
+            this.NewCourseBtn.Text = "New";
+            this.NewCourseBtn.UseVisualStyleBackColor = false;
+            // 
+            // tableLayoutPanel4
+            // 
+            this.tableLayoutPanel4.ColumnCount = 3;
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel4.Controls.Add(this.DeleteAssigmBtn, 2, 0);
+            this.tableLayoutPanel4.Controls.Add(this.EditAssignmentBtn, 1, 0);
+            this.tableLayoutPanel4.Controls.Add(this.NewAssigmBtn, 0, 0);
+            this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel4.Location = new System.Drawing.Point(160, 355);
+            this.tableLayoutPanel4.Name = "tableLayoutPanel4";
+            this.tableLayoutPanel4.RowCount = 1;
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(151, 32);
+            this.tableLayoutPanel4.TabIndex = 21;
+            // 
+            // DeleteAssigmBtn
+            // 
+            this.DeleteAssigmBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.DeleteAssigmBtn.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.DeleteAssigmBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DeleteAssigmBtn.Location = new System.Drawing.Point(103, 3);
+            this.DeleteAssigmBtn.Name = "DeleteAssigmBtn";
+            this.DeleteAssigmBtn.Size = new System.Drawing.Size(45, 26);
+            this.DeleteAssigmBtn.TabIndex = 25;
+            this.DeleteAssigmBtn.Text = "Delete";
+            this.DeleteAssigmBtn.UseVisualStyleBackColor = false;
+            // 
+            // EditAssignmentBtn
+            // 
+            this.EditAssignmentBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.EditAssignmentBtn.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.EditAssignmentBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.EditAssignmentBtn.Location = new System.Drawing.Point(53, 3);
+            this.EditAssignmentBtn.Name = "EditAssignmentBtn";
+            this.EditAssignmentBtn.Size = new System.Drawing.Size(44, 26);
+            this.EditAssignmentBtn.TabIndex = 24;
+            this.EditAssignmentBtn.Text = "Edit";
+            this.EditAssignmentBtn.UseVisualStyleBackColor = false;
+            // 
+            // NewAssigmBtn
+            // 
+            this.NewAssigmBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.NewAssigmBtn.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.NewAssigmBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.NewAssigmBtn.Location = new System.Drawing.Point(3, 3);
+            this.NewAssigmBtn.Name = "NewAssigmBtn";
+            this.NewAssigmBtn.Size = new System.Drawing.Size(44, 26);
+            this.NewAssigmBtn.TabIndex = 23;
+            this.NewAssigmBtn.Text = "New";
+            this.NewAssigmBtn.UseVisualStyleBackColor = false;
+            // 
+            // tableLayoutPanel5
+            // 
+            this.tableLayoutPanel5.ColumnCount = 3;
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel5.Controls.Add(this.DeleteRespBtn, 2, 0);
+            this.tableLayoutPanel5.Controls.Add(this.EditResponseBtn, 1, 0);
+            this.tableLayoutPanel5.Controls.Add(this.NewRespBtn, 0, 0);
+            this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel5.Location = new System.Drawing.Point(317, 355);
+            this.tableLayoutPanel5.Name = "tableLayoutPanel5";
+            this.tableLayoutPanel5.RowCount = 1;
+            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(151, 32);
+            this.tableLayoutPanel5.TabIndex = 25;
+            // 
+            // DeleteRespBtn
+            // 
+            this.DeleteRespBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.DeleteRespBtn.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.DeleteRespBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DeleteRespBtn.Location = new System.Drawing.Point(103, 3);
+            this.DeleteRespBtn.Name = "DeleteRespBtn";
+            this.DeleteRespBtn.Size = new System.Drawing.Size(45, 26);
+            this.DeleteRespBtn.TabIndex = 25;
+            this.DeleteRespBtn.Text = "Delete";
+            this.DeleteRespBtn.UseVisualStyleBackColor = false;
+            // 
+            // EditResponseBtn
+            // 
+            this.EditResponseBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.EditResponseBtn.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.EditResponseBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.EditResponseBtn.Location = new System.Drawing.Point(53, 3);
+            this.EditResponseBtn.Name = "EditResponseBtn";
+            this.EditResponseBtn.Size = new System.Drawing.Size(44, 26);
+            this.EditResponseBtn.TabIndex = 24;
+            this.EditResponseBtn.Text = "Edit";
+            this.EditResponseBtn.UseVisualStyleBackColor = false;
+            // 
+            // NewRespBtn
+            // 
+            this.NewRespBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.NewRespBtn.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.NewRespBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.NewRespBtn.Location = new System.Drawing.Point(3, 3);
+            this.NewRespBtn.Name = "NewRespBtn";
+            this.NewRespBtn.Size = new System.Drawing.Size(44, 26);
+            this.NewRespBtn.TabIndex = 23;
+            this.NewRespBtn.Text = "New";
+            this.NewRespBtn.UseVisualStyleBackColor = false;
+            // 
             // Database
             // 
             this.Database.BackColor = System.Drawing.Color.Transparent;
@@ -456,162 +603,16 @@
             // openDatabaseToolStripMenuItem
             // 
             this.openDatabaseToolStripMenuItem.Name = "openDatabaseToolStripMenuItem";
-            this.openDatabaseToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this.openDatabaseToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openDatabaseToolStripMenuItem.Text = "Open Database";
             this.openDatabaseToolStripMenuItem.Click += new System.EventHandler(this.openDatabaseToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "Exit";
-            // 
-            // NewCourseBtn
-            // 
-            this.NewCourseBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.NewCourseBtn.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.NewCourseBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.NewCourseBtn.ForeColor = System.Drawing.Color.Black;
-            this.NewCourseBtn.Location = new System.Drawing.Point(3, 3);
-            this.NewCourseBtn.Name = "NewCourseBtn";
-            this.NewCourseBtn.Size = new System.Drawing.Size(44, 26);
-            this.NewCourseBtn.TabIndex = 22;
-            this.NewCourseBtn.Text = "New";
-            this.NewCourseBtn.UseVisualStyleBackColor = false;
-            // 
-            // EditCourseBtn
-            // 
-            this.EditCourseBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.EditCourseBtn.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.EditCourseBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.EditCourseBtn.ForeColor = System.Drawing.Color.Black;
-            this.EditCourseBtn.Location = new System.Drawing.Point(53, 3);
-            this.EditCourseBtn.Name = "EditCourseBtn";
-            this.EditCourseBtn.Size = new System.Drawing.Size(44, 26);
-            this.EditCourseBtn.TabIndex = 23;
-            this.EditCourseBtn.Text = "Edit";
-            this.EditCourseBtn.UseVisualStyleBackColor = false;
-            // 
-            // DeleteCourseBtn
-            // 
-            this.DeleteCourseBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.DeleteCourseBtn.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.DeleteCourseBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DeleteCourseBtn.ForeColor = System.Drawing.Color.Black;
-            this.DeleteCourseBtn.Location = new System.Drawing.Point(103, 3);
-            this.DeleteCourseBtn.Name = "DeleteCourseBtn";
-            this.DeleteCourseBtn.Size = new System.Drawing.Size(45, 26);
-            this.DeleteCourseBtn.TabIndex = 24;
-            this.DeleteCourseBtn.Text = "Delete";
-            this.DeleteCourseBtn.UseVisualStyleBackColor = false;
-            // 
-            // tableLayoutPanel4
-            // 
-            this.tableLayoutPanel4.ColumnCount = 3;
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel4.Controls.Add(this.DeleteAssigmBtn, 2, 0);
-            this.tableLayoutPanel4.Controls.Add(this.EditAssignmentBtn, 1, 0);
-            this.tableLayoutPanel4.Controls.Add(this.NewAssigmBtn, 0, 0);
-            this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel4.Location = new System.Drawing.Point(160, 355);
-            this.tableLayoutPanel4.Name = "tableLayoutPanel4";
-            this.tableLayoutPanel4.RowCount = 1;
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(151, 32);
-            this.tableLayoutPanel4.TabIndex = 21;
-            // 
-            // NewAssigmBtn
-            // 
-            this.NewAssigmBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.NewAssigmBtn.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.NewAssigmBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.NewAssigmBtn.Location = new System.Drawing.Point(3, 3);
-            this.NewAssigmBtn.Name = "NewAssigmBtn";
-            this.NewAssigmBtn.Size = new System.Drawing.Size(44, 26);
-            this.NewAssigmBtn.TabIndex = 23;
-            this.NewAssigmBtn.Text = "New";
-            this.NewAssigmBtn.UseVisualStyleBackColor = false;
-            // 
-            // EditAssignmentBtn
-            // 
-            this.EditAssignmentBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.EditAssignmentBtn.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.EditAssignmentBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.EditAssignmentBtn.Location = new System.Drawing.Point(53, 3);
-            this.EditAssignmentBtn.Name = "EditAssignmentBtn";
-            this.EditAssignmentBtn.Size = new System.Drawing.Size(44, 26);
-            this.EditAssignmentBtn.TabIndex = 24;
-            this.EditAssignmentBtn.Text = "Edit";
-            this.EditAssignmentBtn.UseVisualStyleBackColor = false;
-            // 
-            // DeleteAssigmBtn
-            // 
-            this.DeleteAssigmBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.DeleteAssigmBtn.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.DeleteAssigmBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DeleteAssigmBtn.Location = new System.Drawing.Point(103, 3);
-            this.DeleteAssigmBtn.Name = "DeleteAssigmBtn";
-            this.DeleteAssigmBtn.Size = new System.Drawing.Size(45, 26);
-            this.DeleteAssigmBtn.TabIndex = 25;
-            this.DeleteAssigmBtn.Text = "Delete";
-            this.DeleteAssigmBtn.UseVisualStyleBackColor = false;
-            // 
-            // tableLayoutPanel5
-            // 
-            this.tableLayoutPanel5.ColumnCount = 3;
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel5.Controls.Add(this.DeleteRespBtn, 2, 0);
-            this.tableLayoutPanel5.Controls.Add(this.EditResponseBtn, 1, 0);
-            this.tableLayoutPanel5.Controls.Add(this.NewRespBtn, 0, 0);
-            this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel5.Location = new System.Drawing.Point(317, 355);
-            this.tableLayoutPanel5.Name = "tableLayoutPanel5";
-            this.tableLayoutPanel5.RowCount = 1;
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(151, 32);
-            this.tableLayoutPanel5.TabIndex = 25;
-            // 
-            // NewRespBtn
-            // 
-            this.NewRespBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.NewRespBtn.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.NewRespBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.NewRespBtn.Location = new System.Drawing.Point(3, 3);
-            this.NewRespBtn.Name = "NewRespBtn";
-            this.NewRespBtn.Size = new System.Drawing.Size(44, 26);
-            this.NewRespBtn.TabIndex = 23;
-            this.NewRespBtn.Text = "New";
-            this.NewRespBtn.UseVisualStyleBackColor = false;
-            // 
-            // EditResponseBtn
-            // 
-            this.EditResponseBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.EditResponseBtn.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.EditResponseBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.EditResponseBtn.Location = new System.Drawing.Point(53, 3);
-            this.EditResponseBtn.Name = "EditResponseBtn";
-            this.EditResponseBtn.Size = new System.Drawing.Size(44, 26);
-            this.EditResponseBtn.TabIndex = 24;
-            this.EditResponseBtn.Text = "Edit";
-            this.EditResponseBtn.UseVisualStyleBackColor = false;
-            // 
-            // DeleteRespBtn
-            // 
-            this.DeleteRespBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.DeleteRespBtn.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.DeleteRespBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DeleteRespBtn.Location = new System.Drawing.Point(103, 3);
-            this.DeleteRespBtn.Name = "DeleteRespBtn";
-            this.DeleteRespBtn.Size = new System.Drawing.Size(45, 26);
-            this.DeleteRespBtn.TabIndex = 25;
-            this.DeleteRespBtn.Text = "Delete";
-            this.DeleteRespBtn.UseVisualStyleBackColor = false;
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -636,6 +637,8 @@
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
             this.tableLayoutPanel3.ResumeLayout(false);
+            this.tableLayoutPanel4.ResumeLayout(false);
+            this.tableLayoutPanel5.ResumeLayout(false);
             this.Database.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.TablesTabControl.ResumeLayout(false);
@@ -648,8 +651,6 @@
             this.panel8.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            this.tableLayoutPanel4.ResumeLayout(false);
-            this.tableLayoutPanel5.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
