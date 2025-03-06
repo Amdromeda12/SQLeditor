@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Autofac;
 
-namespace SQLeditor
+namespace SQLeditor.Services
 {
     public static class DependencyInjection
     {

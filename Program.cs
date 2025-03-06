@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using Autofac;
 using Serilog;
 using Serilog.Sinks;
+using SQLeditor.Services;
 
 namespace SQLeditor
 {
