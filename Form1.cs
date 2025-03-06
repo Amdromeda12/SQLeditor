@@ -26,6 +26,7 @@ namespace SQLeditor
 
             InitializeUI();
             InitializeEventHandlers();
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -52,18 +53,19 @@ namespace SQLeditor
             NewRespBtn.Click += _eventHandlers.NewRespBtn_Click;
             EditResponseBtn.Click += _eventHandlers.EditResponseBtn_Click;
             DeleteRespBtn.Click += _eventHandlers.DeleteRespBtn_Click;
+            ExportAssigbtn.Click += _eventHandlers.ExportAssignmentBtn_Click;
+            ExportCourseBtn.Click += _eventHandlers.ExportCourseBtn_Click;
+            Deletebtn.Click += _eventHandlers.DeleteBtn_Click;
 
             // ✅ Tab Events
             TablesTabControl.Selecting += TablesTabControl_Selecting;
             TablesTabControl.SelectedIndexChanged += TablesTabControl_SelectedIndexChanged;
+            TabControl.SelectedIndexChanged += TabControl_SelectedIndexChanged;
 
             //✅ Choosing item in objectlistview
             CourseListView.SelectedIndexChanged += _eventHandlers.CourseListView_SelectedIndexChanged;
             AssignmentListView.SelectedIndexChanged += _eventHandlers.AssignmentListView_SelectedIndexChanged;
             ResponseListView.SelectedIndexChanged += _eventHandlers.ResponseListView_SelectedIndexChanged;
-
-            // ✅ Attach event handlers for Buttons
-            SaveBtn.Click += _eventHandlers.SaveBtn_Click;
 
             btnSortAssignments.Click += (sender, e) => _eventHandlers.BtnSortAssignments_Click(sender, e, SelectedCourseId);
         }
@@ -97,6 +99,31 @@ namespace SQLeditor
         {
             await DataLoader.LoadEditorDataAsync(this, DatabaseService);
         }
- 
+
+        /// <summary>
+        /// Refreshes data when switching Main tabs.
+        /// </summary>
+        private async void TabControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Log.Information($"Tab changed to: {TabControl.SelectedTab.Name}");
+
+            try
+            {
+                switch (TabControl.SelectedTab.Name)
+                {
+                    case "Use":
+                        await DataLoader.LoadCoursesAsync(this, DatabaseService);
+                        break;
+                    case "Database":
+                        await DataLoader.LoadEditorDataAsync(this, DatabaseService);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred while refreshing the tab: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
     }
 }

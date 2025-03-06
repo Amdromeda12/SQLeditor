@@ -5,6 +5,7 @@ using System.Windows.Forms;
 
 namespace SQLeditor.Tools
 {
+    //This is unused But can be Used for further update
     public class RoundedPanel : Panel
     {
         // Properties for customization

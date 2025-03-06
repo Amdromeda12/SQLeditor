@@ -6,6 +6,9 @@ namespace SQLeditor
 {
     public static class Prompt
     {
+        /// <summary>
+        /// Propet used mainly for the events add edit delete and export
+        /// </summary>
         public static Dictionary<string, string> ShowDialog(string caption, List<string> fieldNames, Dictionary<string, string> defaultValues = null)
         {
             Form prompt = new Form

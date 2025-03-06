@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using SQLeditor.Models;
@@ -263,6 +264,7 @@ namespace SQLeditor.Services
             }
         }
 
+        // ✅ Rest Id in database so it continue from the current last id after deletíng something
         public async Task ResetAutoIncrementAsync(string tableName)
         {
             using (var conn = GetConnection())
@@ -270,6 +272,47 @@ namespace SQLeditor.Services
                 await conn.OpenAsync();
                 string resetQuery = $"DELETE FROM sqlite_sequence WHERE name = @TableName";
                 await conn.ExecuteAsync(resetQuery, new { TableName = tableName });
+            }
+        }
+
+        // ✅ Get Specific Course for exporting
+        public async Task<Course> GetCourseByIdAsync(int courseId)
+        {
+            using (var conn = GetConnection())
+            {
+                await conn.OpenAsync();
+                return await conn.QueryFirstOrDefaultAsync<Course>(
+                    "SELECT Id, CourseName, CourseDescription FROM courses WHERE Id = @Id",
+                    new { Id = courseId }
+                );
+            }
+        }
+
+        // ✅ get Specific Assignment based on course id for exporting
+        public async Task<List<Assignment>> GetAssignmentsByCourseIdAsync(int courseId)
+        {
+            using (var conn = GetConnection())
+            {
+                await conn.OpenAsync();
+                var result = await conn.QueryAsync<Assignment>(
+                    "SELECT Id, CourseId, AssignmentTitle, AssignmentDescription, AssignmentPosition FROM assignments WHERE CourseId = @CourseId",
+                    new { CourseId = courseId }
+                );
+                return result.ToList();
+            }
+        }
+
+        // ✅ get Specific Responses based on Assignment id for exporting
+        public async Task<List<Response>> GetResponsesByAssignmentIdAsync(int assignmentId)
+        {
+            using (var conn = GetConnection())
+            {
+                await conn.OpenAsync();
+                var result = await conn.QueryAsync<Response>(
+                    "SELECT Id, AssignmentId, ResponseTitle, ResponseText FROM responses WHERE AssignmentId = @AssignmentId",
+                    new { AssignmentId = assignmentId }
+                );
+                return result.ToList();
             }
         }
     }

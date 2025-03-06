@@ -8,6 +8,7 @@ namespace SQLeditor.Services
 {
     public static class UIHelper
     {
+        //Disalbe the buttons if no database is loaded
         public static void SetDatabaseState(Form1 form, bool isEnabled)
         {
             if (form == null) return;
@@ -26,10 +27,13 @@ namespace SQLeditor.Services
             form.CopyBtn.Enabled = isEnabled;
             form.TablesTabControl.Enabled = isEnabled;
             form.btnSortAssignments.Enabled = isEnabled;
+            form.ExportAssigbtn.Enabled = isEnabled;
+            form.ExportCourseBtn.Enabled = isEnabled;
 
             Log.Information($"Database state set to {(isEnabled ? "Enabled" : "Disabled")}");
         }
 
+        //Add Object list View and Design it
         public static void InitializeObjectListViews(Form1 form)
         {
             form.CourseListView = new BrightIdeasSoftware.ObjectListView();
