@@ -23,11 +23,6 @@ bld/
 .vs/
 .vscode/
 
-## NuGet packages
-*.nupkg
-project.lock.json
-project.assets.json
-
 ## Database and dependency files (Keeping database files)
 *.db-shm
 *.db-wal
