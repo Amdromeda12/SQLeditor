@@ -44,3 +44,6 @@ bld/
 ## Log files
 *.log
 *.tlog
+
+# Ignore NuGet packages
+packages/
