@@ -25,6 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -159,6 +160,8 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="bin\Debug\SQLeditor.exe.config" />
+    <None Include="bin\Release\SQLeditor.exe.config" />
     <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -176,6 +179,112 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
+    <Content Include="bin\Debug\Autofac.dll" />
+    <Content Include="bin\Debug\Autofac.Extensions.DependencyInjection.dll" />
+    <Content Include="bin\Debug\Autofac.Extensions.DependencyInjection.xml" />
+    <Content Include="bin\Debug\Autofac.xml" />
+    <Content Include="bin\Debug\Dapper.dll" />
+    <Content Include="bin\Debug\Dapper.xml" />
+    <Content Include="bin\Debug\EntityFramework.dll" />
+    <Content Include="bin\Debug\EntityFramework.SqlServer.dll" />
+    <Content Include="bin\Debug\EntityFramework.SqlServer.xml" />
+    <Content Include="bin\Debug\EntityFramework.xml" />
+    <Content Include="bin\Debug\logs\log-20250304.txt" />
+    <Content Include="bin\Debug\logs\log20250227.txt" />
+    <Content Include="bin\Debug\logs\log20250228.txt" />
+    <Content Include="bin\Debug\logs\log20250304.txt" />
+    <Content Include="bin\Debug\logs\log20250305.txt" />
+    <Content Include="bin\Debug\logs\log20250306.txt" />
+    <Content Include="bin\Debug\logs\log20250307.txt" />
+    <Content Include="bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll" />
+    <Content Include="bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml" />
+    <Content Include="bin\Debug\Microsoft.Data.Sqlite.dll" />
+    <Content Include="bin\Debug\Microsoft.Data.Sqlite.xml" />
+    <Content Include="bin\Debug\Microsoft.Extensions.DependencyInjection.Abstractions.dll" />
+    <Content Include="bin\Debug\Microsoft.Extensions.DependencyInjection.Abstractions.xml" />
+    <Content Include="bin\Debug\ObjectListView.dll" />
+    <Content Include="bin\Debug\ObjectListView.xml" />
+    <Content Include="bin\Debug\Serilog.dll" />
+    <Content Include="bin\Debug\Serilog.Sinks.Console.dll" />
+    <Content Include="bin\Debug\Serilog.Sinks.Console.xml" />
+    <Content Include="bin\Debug\Serilog.Sinks.File.dll" />
+    <Content Include="bin\Debug\Serilog.Sinks.File.xml" />
+    <Content Include="bin\Debug\Serilog.xml" />
+    <Content Include="bin\Debug\SQLeditor.exe" />
+    <Content Include="bin\Debug\SQLeditor.pdb" />
+    <Content Include="bin\Debug\SQLitePCLRaw.batteries_v2.dll" />
+    <Content Include="bin\Debug\SQLitePCLRaw.core.dll" />
+    <Content Include="bin\Debug\SQLitePCLRaw.provider.dynamic_cdecl.dll" />
+    <Content Include="bin\Debug\System.Buffers.dll" />
+    <Content Include="bin\Debug\System.Buffers.xml" />
+    <Content Include="bin\Debug\System.Data.SQLite.dll" />
+    <Content Include="bin\Debug\System.Data.SQLite.EF6.dll" />
+    <Content Include="bin\Debug\System.Data.SQLite.Linq.dll" />
+    <Content Include="bin\Debug\System.Data.SQLite.xml" />
+    <Content Include="bin\Debug\System.Diagnostics.DiagnosticSource.dll" />
+    <Content Include="bin\Debug\System.Diagnostics.DiagnosticSource.xml" />
+    <Content Include="bin\Debug\System.Memory.dll" />
+    <Content Include="bin\Debug\System.Memory.xml" />
+    <Content Include="bin\Debug\System.Numerics.Vectors.dll" />
+    <Content Include="bin\Debug\System.Numerics.Vectors.xml" />
+    <Content Include="bin\Debug\System.Runtime.CompilerServices.Unsafe.dll" />
+    <Content Include="bin\Debug\System.Runtime.CompilerServices.Unsafe.xml" />
+    <Content Include="bin\Debug\System.Threading.Channels.dll" />
+    <Content Include="bin\Debug\System.Threading.Channels.xml" />
+    <Content Include="bin\Debug\System.Threading.Tasks.Extensions.dll" />
+    <Content Include="bin\Debug\System.Threading.Tasks.Extensions.xml" />
+    <Content Include="bin\Debug\x64\SQLite.Interop.dll" />
+    <Content Include="bin\Debug\x86\SQLite.Interop.dll" />
+    <Content Include="bin\Release\Autofac.dll" />
+    <Content Include="bin\Release\Autofac.Extensions.DependencyInjection.dll" />
+    <Content Include="bin\Release\Autofac.Extensions.DependencyInjection.xml" />
+    <Content Include="bin\Release\Autofac.xml" />
+    <Content Include="bin\Release\Dapper.dll" />
+    <Content Include="bin\Release\Dapper.xml" />
+    <Content Include="bin\Release\EntityFramework.dll" />
+    <Content Include="bin\Release\EntityFramework.SqlServer.dll" />
+    <Content Include="bin\Release\EntityFramework.SqlServer.xml" />
+    <Content Include="bin\Release\EntityFramework.xml" />
+    <Content Include="bin\Release\logs\log20250307.txt" />
+    <Content Include="bin\Release\Microsoft.Bcl.AsyncInterfaces.dll" />
+    <Content Include="bin\Release\Microsoft.Bcl.AsyncInterfaces.xml" />
+    <Content Include="bin\Release\Microsoft.Data.Sqlite.dll" />
+    <Content Include="bin\Release\Microsoft.Data.Sqlite.xml" />
+    <Content Include="bin\Release\Microsoft.Extensions.DependencyInjection.Abstractions.dll" />
+    <Content Include="bin\Release\Microsoft.Extensions.DependencyInjection.Abstractions.xml" />
+    <Content Include="bin\Release\ObjectListView.dll" />
+    <Content Include="bin\Release\ObjectListView.xml" />
+    <Content Include="bin\Release\Serilog.dll" />
+    <Content Include="bin\Release\Serilog.Sinks.Console.dll" />
+    <Content Include="bin\Release\Serilog.Sinks.Console.xml" />
+    <Content Include="bin\Release\Serilog.Sinks.File.dll" />
+    <Content Include="bin\Release\Serilog.Sinks.File.xml" />
+    <Content Include="bin\Release\Serilog.xml" />
+    <Content Include="bin\Release\SQLeditor.exe" />
+    <Content Include="bin\Release\SQLeditor.pdb" />
+    <Content Include="bin\Release\SQLitePCLRaw.batteries_v2.dll" />
+    <Content Include="bin\Release\SQLitePCLRaw.core.dll" />
+    <Content Include="bin\Release\SQLitePCLRaw.provider.dynamic_cdecl.dll" />
+    <Content Include="bin\Release\System.Buffers.dll" />
+    <Content Include="bin\Release\System.Buffers.xml" />
+    <Content Include="bin\Release\System.Data.SQLite.dll" />
+    <Content Include="bin\Release\System.Data.SQLite.EF6.dll" />
+    <Content Include="bin\Release\System.Data.SQLite.Linq.dll" />
+    <Content Include="bin\Release\System.Data.SQLite.xml" />
+    <Content Include="bin\Release\System.Diagnostics.DiagnosticSource.dll" />
+    <Content Include="bin\Release\System.Diagnostics.DiagnosticSource.xml" />
+    <Content Include="bin\Release\System.Memory.dll" />
+    <Content Include="bin\Release\System.Memory.xml" />
+    <Content Include="bin\Release\System.Numerics.Vectors.dll" />
+    <Content Include="bin\Release\System.Numerics.Vectors.xml" />
+    <Content Include="bin\Release\System.Runtime.CompilerServices.Unsafe.dll" />
+    <Content Include="bin\Release\System.Runtime.CompilerServices.Unsafe.xml" />
+    <Content Include="bin\Release\System.Threading.Channels.dll" />
+    <Content Include="bin\Release\System.Threading.Channels.xml" />
+    <Content Include="bin\Release\System.Threading.Tasks.Extensions.dll" />
+    <Content Include="bin\Release\System.Threading.Tasks.Extensions.xml" />
+    <Content Include="bin\Release\x64\SQLite.Interop.dll" />
+    <Content Include="bin\Release\x86\SQLite.Interop.dll" />
     <Content Include="ILLink\ILLink.Descriptors.LibraryBuild.xml" />
   </ItemGroup>
   <ItemGroup />
